@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+if [ ! -d "./teamshares_packages" ]; then
+  echo "Missing teamshares_packages directory -- are you sure you're in the teamshares monorepo?"
+  exit 1
+elif [ ! -z "$PROJECT_PATH" ]; then
+  echo "Missing PROJECT_PATH in env -- must be set as a Heroku config var"
+  exit 1
+else
+  echo "Teamshares monorepo buildpack"
+  exit 0
+fi
