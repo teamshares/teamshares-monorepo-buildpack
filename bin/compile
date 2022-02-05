@@ -6,7 +6,7 @@ BUILD_DIR=${1:-}
 CACHE_DIR=${2:-}
 ENV_DIR=${3:-}
 
-# PROJECT_PATH should be set as a Heroku config var (reused by https://github.com/timanovsky/subdir-heroku-buildpack)
-PROJECT_PATH=$(cat $ENV_DIR/PROJECT_PATH)
+# Re-exporting APP_SUBDIR as PROJECT_PATH for downstream https://github.com/timanovsky/subdir-heroku-buildpack
+export $PROJECT_PATH=$(cat $ENV_DIR/APP_SUBDIR)
 
 echo "=====> Rewriting package references in anticipation of downstream buildpack promoting $PROJECT_PATH to the app root"
