@@ -19,18 +19,8 @@ log() {
   echo $* | indent
 }
 
-# Re-exporting APP_SUBDIR as PROJECT_PATH for downstream https://github.com/timanovsky/subdir-heroku-buildpack
-export PROJECT_PATH="$(cat $ENV_DIR/APP_SUBDIR)"
-echo "export PROJECT_PATH=\"${PROJECT_PATH}\"" >> "./export"
-
-if [ -w "$BP_DIR" ]; then
-  echo "export PROJECT_PATH=\"${PROJECT_PATH}\"" >> "${BP_DIR}/export"
-fi
-
-echo "New export file in ${BP_DIR}:"
-cat "${BP_DIR}/export"
-echo ""
-
+# Using PROJECT_PATH as it's also needed for downstream https://github.com/timanovsky/subdir-heroku-buildpack
+PROJECT_PATH="$(cat $ENV_DIR/PROJECT_PATH)"
 APP_DIR="${BUILD_DIR}/${PROJECT_PATH}"
 
 log_header "Rewriting package references in anticipation of downstream buildpack promoting $APP_DIR to the app root"
