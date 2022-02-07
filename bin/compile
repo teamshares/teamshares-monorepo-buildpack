@@ -6,36 +6,48 @@ BUILD_DIR=${1:-}
 CACHE_DIR=${2:-}
 ENV_DIR=${3:-}
 
+log_header() {
+  echo "-----> " $*
+}
+
 indent() {
   sed -u 's/^/       /'
 }
 
+log() {
+  echo $* | indent
+}
+
 # Re-exporting APP_SUBDIR as PROJECT_PATH for downstream https://github.com/timanovsky/subdir-heroku-buildpack
 export PROJECT_PATH="$(cat $ENV_DIR/APP_SUBDIR)"
-echo "export PROJECT_PATH=\"$(cat $ENV_DIR/APP_SUBDIR)\"" >> "./export"
+echo "export PROJECT_PATH=\"${PROJECT_PATH}\"" >> "./export"
+
+echo "New export file:"
+cat "./export"
+echo ""
 
 APP_DIR="${BUILD_DIR}/${PROJECT_PATH}"
 
-echo "=====> Rewriting package references in anticipation of downstream buildpack promoting $APP_DIR to the app root"
+log_header "Rewriting package references in anticipation of downstream buildpack promoting $APP_DIR to the app root"
 
 # Copy app.json over to maintain review app configurations
 if [[ -f "${BUILD_DIR}/app.json" ]]; then
   cp "${BUILD_DIR}/app.json" "${APP_DIR}/app.json"
-  echo "Copied ${BUILD_DIR}/app.json to ${APP_DIR}/app.json successfully" | indent
+  log "Copied ${BUILD_DIR}/app.json to ${APP_DIR}/app.json successfully"
 fi
 
 # Move teamshares_packages from ../ to ./ (from build dir)
 if [[ -d "${BUILD_DIR}/teamshares_packages" ]]; then
   cp -r "${BUILD_DIR}/teamshares_packages" "${APP_DIR}/teamshares_packages"
-  echo "Copied ${BUILD_DIR}/teamshares_packages to ${APP_DIR}/teamshares_packages successfully" | indent
+  log "Copied ${BUILD_DIR}/teamshares_packages to ${APP_DIR}/teamshares_packages successfully"
 else
-  echo "MISSING teamshares_packages -- are you sure you're in the right repo?" | indent
+  log "MISSING teamshares_packages -- are you sure you're in the right repo?"
   exit 1
 fi
 
 update_references () {
   sed -i -e "s|../teamshares_packages|./teamshares_packages|g" "${APP_DIR}/$1"
-  echo "Updated references in $1 successfully" | indent
+  log "Updated references in $1 successfully"
 }
 
 echo ""
