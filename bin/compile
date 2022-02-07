@@ -37,6 +37,6 @@ update_references () {
   echo "Updated references in $1 successfully" | indent
 }
 
-update_references("${APP_DIR}/Gemfile")       # gem "teamshares_rails", path: "../teamshares_packages/teamshares_rails"
-update_references("${APP_DIR}/Gemfile.lock")  # remote: ../teamshares_packages/teamshares_rails
-update_references("${APP_DIR}/package.json")  # "@teamshares/ui": "file:../teamshares_packages/ui",
+update_references "${APP_DIR}/Gemfile"       # gem "teamshares_rails", path: "../teamshares_packages/teamshares_rails"
+update_references "${APP_DIR}/Gemfile.lock"  # remote: ../teamshares_packages/teamshares_rails
+update_references "${APP_DIR}/package.json"  # "@teamshares/ui": "file:../teamshares_packages/ui",
