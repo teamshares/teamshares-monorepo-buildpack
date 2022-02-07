@@ -6,6 +6,9 @@ BUILD_DIR=${1:-}
 CACHE_DIR=${2:-}
 ENV_DIR=${3:-}
 
+indent() {
+  sed -u 's/^/       /'
+}
 
 # Re-exporting APP_SUBDIR as PROJECT_PATH for downstream https://github.com/timanovsky/subdir-heroku-buildpack
 export PROJECT_PATH="$(cat $ENV_DIR/APP_SUBDIR)"
