@@ -19,17 +19,30 @@ log() {
   echo $* | indent
 }
 
+move_file () {
+  if [[ -f "${BUILD_DIR}/$1" ]]; then
+    cp "${BUILD_DIR}/$1" "${APP_DIR}/$1"
+    log "Copied ${BUILD_DIR}/$1 to ${APP_DIR}/$1 successfully"
+  else
+    log "MISSING $1 in ${BUILD_DIR}"
+  fi
+}
+
+update_references () {
+  sed -i -e "s|../teamshares_packages|./teamshares_packages|g" "${APP_DIR}/$1"
+  log "Updated references in $1 successfully"
+}
+
+
 # Using PROJECT_PATH as it's also needed for downstream https://github.com/timanovsky/subdir-heroku-buildpack
 PROJECT_PATH="$(cat $ENV_DIR/PROJECT_PATH)"
 APP_DIR="${BUILD_DIR}/${PROJECT_PATH}"
 
 log_header "Rewriting package references in anticipation of downstream buildpack promoting $APP_DIR to the app root"
 
-# Copy app.json over to maintain review app configurations
-if [[ -f "${BUILD_DIR}/app.json" ]]; then
-  cp "${BUILD_DIR}/app.json" "${APP_DIR}/app.json"
-  log "Copied ${BUILD_DIR}/app.json to ${APP_DIR}/app.json successfully"
-fi
+
+move_file "app.json"  # Copy app.json over to maintain review app configurations
+move_file "yarn.lock" # Not sure about this one -- move over yarn.lock
 
 # Move teamshares_packages from ../ to ./ (from build dir)
 if [[ -d "${BUILD_DIR}/teamshares_packages" ]]; then
@@ -40,10 +53,6 @@ else
   exit 1
 fi
 
-update_references () {
-  sed -i -e "s|../teamshares_packages|./teamshares_packages|g" "${APP_DIR}/$1"
-  log "Updated references in $1 successfully"
-}
 
 echo ""
 update_references "Gemfile"       # gem "teamshares_rails", path: "../teamshares_packages/teamshares_rails"
