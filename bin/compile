@@ -9,12 +9,13 @@ ENV_DIR=${3:-}
 
 # Re-exporting APP_SUBDIR as PROJECT_PATH for downstream https://github.com/timanovsky/subdir-heroku-buildpack
 export PROJECT_PATH="$(cat $ENV_DIR/APP_SUBDIR)"
-APP_DIR=$(dirname "${BUILD_DIR}/${PROJECT_PATH}")
+APP_DIR="${BUILD_DIR}/${PROJECT_PATH}"
 
 echo "=====> Rewriting package references in anticipation of downstream buildpack promoting $PROJECT_PATH to the app root"
 
 # Copy app.json over to maintain review app configurations
 if [[ -f "${BUILD_DIR}/app.json" ]]; then
+  echo "Planning to copy ${BUILD_DIR}/app.json to ${APP_DIR}/app.json..." | indent
   cp "${BUILD_DIR}/app.json" "${APP_DIR}/app.json"
   echo "Copied ${BUILD_DIR}/app.json to ${APP_DIR}/app.json successfully" | indent
 fi
