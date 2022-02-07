@@ -5,6 +5,7 @@ set -e
 BUILD_DIR=${1:-}
 CACHE_DIR=${2:-}
 ENV_DIR=${3:-}
+BP_DIR=$(cd "$(dirname "${0:-}")"; cd ..; pwd)
 
 log_header() {
   echo "-----> " $*
@@ -22,8 +23,12 @@ log() {
 export PROJECT_PATH="$(cat $ENV_DIR/APP_SUBDIR)"
 echo "export PROJECT_PATH=\"${PROJECT_PATH}\"" >> "./export"
 
-echo "New export file:"
-cat "./export"
+if [ -w "$BP_DIR" ]; then
+  echo "export PROJECT_PATH=\"${PROJECT_PATH}\"" >> "${BP_DIR}/export"
+fi
+
+echo "New export file in ${BP_DIR}:"
+cat "${BP_DIR}/export"
 echo ""
 
 APP_DIR="${BUILD_DIR}/${PROJECT_PATH}"
