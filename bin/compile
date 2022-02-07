@@ -32,11 +32,11 @@ else
 fi
 
 update_references () {
-  echo "Updating references in $1..." | indent
   sed -i -e "s|../teamshares_packages|./teamshares_packages|g" "$1"
   echo "Updated references in $1 successfully" | indent
 }
 
+echo ""
 update_references "${APP_DIR}/Gemfile"       # gem "teamshares_rails", path: "../teamshares_packages/teamshares_rails"
 update_references "${APP_DIR}/Gemfile.lock"  # remote: ../teamshares_packages/teamshares_rails
 update_references "${APP_DIR}/package.json"  # "@teamshares/ui": "file:../teamshares_packages/ui",
