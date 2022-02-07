@@ -23,6 +23,7 @@ if [[ -f "${BUILD_DIR}/app.json" ]]; then
   echo "Copied ${BUILD_DIR}/app.json to ${APP_DIR}/app.json successfully" | indent
 fi
 
+# Move teamshares_packages from ../ to ./ (from build dir)
 if [[ -d "${BUILD_DIR}/teamshares_packages" ]]; then
   cp -r "${BUILD_DIR}/teamshares_packages" "${APP_DIR}/teamshares_packages"
   echo "Copied ${BUILD_DIR}/teamshares_packages to ${APP_DIR}/teamshares_packages successfully" | indent
@@ -30,3 +31,13 @@ else
   echo "MISSING teamshares_packages -- are you sure you're in the right repo?" | indent
   exit 1
 fi
+
+update_references(filepath) {
+  echo "Updating references in ${filepath}..." | indent
+  sed -i -e "s|../teamshares_packages|./teamshares_packages|g" "${filepath}"
+  echo "Updated references in ${filepath} successfully" | indent
+}
+
+update_references("${APP_DIR}/Gemfile")       # gem "teamshares_rails", path: "../teamshares_packages/teamshares_rails"
+update_references("${APP_DIR}/Gemfile.lock")  # remote: ../teamshares_packages/teamshares_rails
+update_references("${APP_DIR}/package.json")  # "@teamshares/ui": "file:../teamshares_packages/ui",
