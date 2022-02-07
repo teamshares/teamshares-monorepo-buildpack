@@ -24,7 +24,7 @@ if [[ -f "${BUILD_DIR}/app.json" ]]; then
 fi
 
 if [[ -d "${BUILD_DIR}/teamshares_packages" ]]; then
-  cp -f "${BUILD_DIR}/teamshares_packages" "${APP_DIR}/teamshares_packages"
+  cp -r "${BUILD_DIR}/teamshares_packages" "${APP_DIR}/teamshares_packages"
   echo "Copied ${BUILD_DIR}/teamshares_packages to ${APP_DIR}/teamshares_packages successfully" | indent
 else
   echo "MISSING teamshares_packages -- are you sure you're in the right repo?" | indent
