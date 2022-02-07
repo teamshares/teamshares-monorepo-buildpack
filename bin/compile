@@ -40,3 +40,6 @@ echo ""
 update_references "${APP_DIR}/Gemfile"       # gem "teamshares_rails", path: "../teamshares_packages/teamshares_rails"
 update_references "${APP_DIR}/Gemfile.lock"  # remote: ../teamshares_packages/teamshares_rails
 update_references "${APP_DIR}/package.json"  # "@teamshares/ui": "file:../teamshares_packages/ui",
+
+echo ""
+cat "${APP_DIR}/Gemfile" | grep "teamshares_packages"
