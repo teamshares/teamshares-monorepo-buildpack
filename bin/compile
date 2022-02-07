@@ -12,9 +12,11 @@ indent() {
 
 # Re-exporting APP_SUBDIR as PROJECT_PATH for downstream https://github.com/timanovsky/subdir-heroku-buildpack
 export PROJECT_PATH="$(cat $ENV_DIR/APP_SUBDIR)"
+echo "export PROJECT_PATH=\"$(cat $ENV_DIR/APP_SUBDIR)\"" >> "./export"
+
 APP_DIR="${BUILD_DIR}/${PROJECT_PATH}"
 
-echo "=====> Rewriting package references in anticipation of downstream buildpack promoting $PROJECT_PATH to the app root"
+echo "=====> Rewriting package references in anticipation of downstream buildpack promoting $APP_DIR to the app root"
 
 # Copy app.json over to maintain review app configurations
 if [[ -f "${BUILD_DIR}/app.json" ]]; then
@@ -32,14 +34,12 @@ else
 fi
 
 update_references () {
-  sed -i -e "s|../teamshares_packages|./teamshares_packages|g" "$1"
+  sed -i -e "s|../teamshares_packages|./teamshares_packages|g" "${APP_DIR}/$1"
   echo "Updated references in $1 successfully" | indent
 }
 
 echo ""
-update_references "${APP_DIR}/Gemfile"       # gem "teamshares_rails", path: "../teamshares_packages/teamshares_rails"
-update_references "${APP_DIR}/Gemfile.lock"  # remote: ../teamshares_packages/teamshares_rails
-update_references "${APP_DIR}/package.json"  # "@teamshares/ui": "file:../teamshares_packages/ui",
+update_references "Gemfile"       # gem "teamshares_rails", path: "../teamshares_packages/teamshares_rails"
+update_references "Gemfile.lock"  # remote: ../teamshares_packages/teamshares_rails
+update_references "package.json"  # "@teamshares/ui": "file:../teamshares_packages/ui",
 
-echo ""
-cat "${APP_DIR}/Gemfile" | grep "teamshares_packages"
