@@ -18,7 +18,6 @@ echo "=====> Rewriting package references in anticipation of downstream buildpac
 
 # Copy app.json over to maintain review app configurations
 if [[ -f "${BUILD_DIR}/app.json" ]]; then
-  echo "Planning to copy ${BUILD_DIR}/app.json to ${APP_DIR}/app.json..." | indent
   cp "${BUILD_DIR}/app.json" "${APP_DIR}/app.json"
   echo "Copied ${BUILD_DIR}/app.json to ${APP_DIR}/app.json successfully" | indent
 fi
@@ -32,10 +31,10 @@ else
   exit 1
 fi
 
-update_references(filepath) {
-  echo "Updating references in ${filepath}..." | indent
-  sed -i -e "s|../teamshares_packages|./teamshares_packages|g" "${filepath}"
-  echo "Updated references in ${filepath} successfully" | indent
+update_references () {
+  echo "Updating references in $1..." | indent
+  sed -i -e "s|../teamshares_packages|./teamshares_packages|g" "$1"
+  echo "Updated references in $1 successfully" | indent
 }
 
 update_references("${APP_DIR}/Gemfile")       # gem "teamshares_rails", path: "../teamshares_packages/teamshares_rails"
