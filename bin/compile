@@ -33,13 +33,11 @@ update_references () {
   log "Updated references in $1 successfully"
 }
 
-
 # Using PROJECT_PATH as it's also needed for downstream https://github.com/timanovsky/subdir-heroku-buildpack
 PROJECT_PATH="$(cat $ENV_DIR/PROJECT_PATH)"
 APP_DIR="${BUILD_DIR}/${PROJECT_PATH}"
 
 log_header "Rewriting package references in anticipation of downstream buildpack promoting $APP_DIR to the app root"
-
 
 move_file "app.json"  # Copy app.json over to maintain review app configurations
 move_file "yarn.lock" # Not sure about this one -- move over yarn.lock
@@ -53,9 +51,10 @@ else
   exit 1
 fi
 
-
+# Now update all the referencing files
 echo ""
 update_references "Gemfile"       # gem "teamshares_rails", path: "../teamshares_packages/teamshares_rails"
 update_references "Gemfile.lock"  # remote: ../teamshares_packages/teamshares_rails
 update_references "package.json"  # "@teamshares/ui": "file:../teamshares_packages/ui",
+echo ""
 
