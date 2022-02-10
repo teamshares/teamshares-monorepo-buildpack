@@ -2,8 +2,8 @@
 
 # # Note: when it DOES fail, it doesn't seem to actually echo these lines to the log...?
 
-if [ ! -z "$PROJECT_PATH" ]; then
-  echo "Missing PROJECT_PATH in env -- must be set as a Heroku config var"
+if [ ! -z "$APP_SUBDIR" ]; then
+  echo "Missing APP_SUBDIR in env -- must be set as a Heroku config var"
   exit 1
 else
   echo "Teamshares monorepo buildpack"
