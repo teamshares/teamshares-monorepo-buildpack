@@ -62,12 +62,18 @@ echo ""
 # Originally based on https://github.com/timanovsky/subdir-heroku-buildpack, decided to inline (and clean up logging a bit) given
 # the README's "Disclaimer: I may change the code without notice, so always pin to specific github version. Provided as is."
 log_header "Restructuring build dir to promote $APP_SUBDIR to app root"
+
+log "Creating temp dir $TMP_DIR"
 mkdir -p $CACHE_DIR
 TMP_DIR=`mktemp -d $CACHE_DIR/build_dir_XXXXX`
-log "Created temp dir $TMP_DIR"
+
+log "Copying ${APP_BUILD_DIR} to temp dir"
 cp -R $APP_BUILD_DIR/. $TMP_DIR/
-log "Replacing build dir with contents of $TMP_DIR"
+
+log "Promoting temp dir to root"
 rm -rf $BUILD_DIR/*
 cp -R $TMP_DIR/. $BUILD_DIR/
 rm -rf $TMP_DIR
+
 log_header "Done!"
+echo ""
