@@ -7,6 +7,11 @@ CACHE_DIR=${2:-}
 ENV_DIR=${3:-}
 BP_DIR=$(cd "$(dirname "${0:-}")"; cd ..; pwd)
 
+# Path to the directory we'll be promoting to root
+APP_SUBDIR=$(cat $ENV_DIR/APP_SUBDIR)
+APP_BUILD_DIR="${BUILD_DIR}/${APP_SUBDIR}"
+
+
 log_header() {
   echo "----->" $*
 }
@@ -21,31 +26,27 @@ log() {
 
 move_file () {
   if [[ -f "${BUILD_DIR}/$1" ]]; then
-    cp "${BUILD_DIR}/$1" "${APP_DIR}/$1"
-    log "Copied ${BUILD_DIR}/$1 to ${APP_DIR}/$1 successfully"
+    cp "${BUILD_DIR}/$1" "${APP_BUILD_DIR}/$1"
+    log "Copied ${BUILD_DIR}/$1 to ${APP_BUILD_DIR}/$1 successfully"
   else
     log "MISSING $1 in ${BUILD_DIR}"
   fi
 }
 
 update_references () {
-  sed -i -e "s|../teamshares_packages|./teamshares_packages|g" "${APP_DIR}/$1"
+  sed -i -e "s|../teamshares_packages|./teamshares_packages|g" "${APP_BUILD_DIR}/$1"
   log "Updated references in $1 successfully"
 }
 
-# Using PROJECT_PATH as it's also needed for downstream https://github.com/timanovsky/subdir-heroku-buildpack
-PROJECT_PATH="$(cat $ENV_DIR/PROJECT_PATH)"
-APP_DIR="${BUILD_DIR}/${PROJECT_PATH}"
-
-log_header "Rewriting package references in anticipation of downstream buildpack promoting $APP_DIR to the app root"
+log_header "Rewriting package references in anticipation of promoting $APP_SUBDIR to the app root"
 
 move_file "app.json"  # Copy app.json over to maintain review app configurations
 move_file "yarn.lock" # Not sure about this one -- move over yarn.lock
 
 # Move teamshares_packages from ../ to ./ (from build dir)
 if [[ -d "${BUILD_DIR}/teamshares_packages" ]]; then
-  cp -r "${BUILD_DIR}/teamshares_packages" "${APP_DIR}/teamshares_packages"
-  log "Copied ${BUILD_DIR}/teamshares_packages to ${APP_DIR}/teamshares_packages successfully"
+  cp -r "${BUILD_DIR}/teamshares_packages" "${APP_BUILD_DIR}/teamshares_packages"
+  log "Copied ${BUILD_DIR}/teamshares_packages to ${APP_BUILD_DIR}/teamshares_packages successfully"
 else
   log "MISSING teamshares_packages -- are you sure you're in the right repo?"
   exit 1
@@ -58,3 +59,15 @@ update_references "Gemfile.lock"  # remote: ../teamshares_packages/teamshares_ra
 update_references "package.json"  # "@teamshares/ui": "file:../teamshares_packages/ui",
 echo ""
 
+# Originally based on https://github.com/timanovsky/subdir-heroku-buildpack, decided to inline (and clean up logging a bit) given
+# the README's "Disclaimer: I may change the code without notice, so always pin to specific github version. Provided as is."
+log_header "Restructuring build dir to promote $APP_SUBDIR to app root"
+mkdir -p $CACHE_DIR
+TMP_DIR=`mktemp -d $CACHE_DIR/build_dir_XXXXX`
+log "Created temp dir $TMP_DIR"
+cp -R $APP_BUILD_DIR/. $TMP_DIR/
+log "Replacing build dir with contents of $TMP_DIR"
+rm -rf $BUILD_DIR/*
+cp -R $TMP_DIR/. $BUILD_DIR/
+rm -rf $TMP_DIR
+log_header "Done!"
