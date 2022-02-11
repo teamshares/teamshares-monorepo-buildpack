@@ -18,13 +18,13 @@ Custom buildback for deploying apps within the [teamshares monorepo](https://git
 
 ### What does it do now?
 - This [teamshares-specific buildpack](https://github.com/teamshares/teamshares-monorepo-buildpack) kicks off the flow by moving `teamshares_components` from root to under the directory we're keeping, then rewriting some configs so the paths stay current. Now multiple buildpacks are supported, so:
-  - *Now* we can ~~use any of the standard promote-this-subdir-of-monorepo-to-root buildpacks~~ (it was brittle and "subject to update at any time", so we eventually inlined this functionality directly into this buildpack), and then
+  - We can use ~~any of the standard promote-this-subdir-of-monorepo-to-root buildpacks~~ (it was brittle and "subject to update at any time", so we eventually inlined this functionality directly into this buildpack), and then
   - `heroku/nodejs` allows us to explicitly control node version via `package.json` (this buildpack exports updated node paths for any subsequent paths)
   - `heroku/ruby` handles installing rubygems
 
 ### Downsides?
-One currently-known downside: we're switching from a yarn workspace context in development (multiple separate apps' dependencies combined into single root-level `yarn.lock`) to a single subdir in production, but we can't just copy that `yarn.lock` to the subdir (`heroku/nodejs` runs yarn with `--frozen-lockfile`, but the lockfile needs to change now b/c we no longer need all the dependencies for the whole workspace (i.e. we're using a different `package.json`)).
+One currently-known downside: we're switching from a yarn workspace context in development (multiple separate apps' dependencies combined into single root-level `yarn.lock`) to deploying just a single subdir in production. Naive approach is to copy that `yarn.lock` into the subdir, but that makes the build phase fail -- `heroku/nodejs` runs yarn with `--frozen-lockfile`, but the lockfile _should_/_will_ change now that we're using a different `package.json` and no longer need all the dependencies for the whole workspace.
 
-Hopefully eventually there'll be some sort of `yarn workspace eject` or similar command we can use -- there are some very long github discussions without a clear resolution.
+Hopefully eventually there'll be some sort of `yarn workspace eject` or similar command we can use -- there are some very long github discussions ([e.g.](https://github.com/yarnpkg/berry/issues/1223)) without a clear resolution.
 
 For now I've worked around this by adding a `heroku-prebuild` script to run `yarn install` in the subdirectory. This now *works*, but note it means **we are no longer guaranteed that the versions specified in local `yarn.lock` are the same that will be installed in production** (although all our JS dependencies are currently specified with either patch-level (`~`) or minor version (`^`) [limiters](https://docs.npmjs.com/about-semantic-versioning), so I think this is a sane tradeoff).
