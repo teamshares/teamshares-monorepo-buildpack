@@ -42,8 +42,8 @@ log_header "Rewriting package references in anticipation of promoting $APP_SUBDI
 
 # Unfortunately OS requires custom app.json to build review apps successfully
 if [ "$APP_SUBDIR" == "os" ]; then
-  rm app.json
-  mv app.os.json app.json
+  rm "${BUILD_DIR}/app.json"
+  mv "${BUILD_DIR}/app.os.json" "${BUILD_DIR}/app.json"
 fi
 
 move_file "app.json"  # Copy app.json over to maintain review app configurations
