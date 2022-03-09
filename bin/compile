@@ -40,6 +40,12 @@ update_references () {
 
 log_header "Rewriting package references in anticipation of promoting $APP_SUBDIR to the app root"
 
+# Unfortunately OS requires custom app.json to build review apps successfully
+if [ "$APP_SUBDIR" == "os" ]; then
+  rm app.json
+  mv app.os.json app.json
+fi
+
 move_file "app.json"  # Copy app.json over to maintain review app configurations
 move_file "yarn.lock" # Not sure about this one -- move over yarn.lock
 
