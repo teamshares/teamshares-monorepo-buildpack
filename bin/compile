@@ -54,8 +54,7 @@ if [[ -d "${BUILD_DIR}/teamshares_packages" ]]; then
   cp -r "${BUILD_DIR}/teamshares_packages" "${APP_BUILD_DIR}/teamshares_packages"
   log "Copied ${BUILD_DIR}/teamshares_packages to ${APP_BUILD_DIR}/teamshares_packages successfully"
 else
-  log "MISSING teamshares_packages -- are you sure you're in the right repo?"
-  exit 1
+  log "Looks like we're testing a branch without any teamshares_packages... hopefully we can remove this entire buildpack soon!"
 fi
 
 # Now update all the referencing files
