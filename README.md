@@ -1,3 +1,5 @@
+> NOTE: we broke up the monorepo in April 2022, so this buildpack is no longer a necessary component of our deployment infrastructure.
+
 # teamshares-monorepo-buildpack
 
 Custom buildback for deploying apps within the [teamshares monorepo](https://github.com/teamshares/monorepo) on heroku.
